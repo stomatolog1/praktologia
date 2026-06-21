@@ -1,7 +1,7 @@
 package model
 
 type Equipment struct {
-	ID uint `json:"id" gorm:"primarykey"`
+	ID uint `json:"id" gorm:"primaryKey"`
 	Name string `json:"Name"`
 	Description string `json:"Description"`
 	TypeOperating string `json:"TypeOperating"`

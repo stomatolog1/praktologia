@@ -1,0 +1,20 @@
+[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /api/Admin                --> github.com/stomatolog1/praktologia/internal/handlers.(*AdminHandler).Create-fm (3 handlers)
+[GIN-debug] POST   /api/Customer             --> github.com/stomatolog1/praktologia/internal/handlers.(*CustomerHandler).Create-fm (3 handlers)
+[GIN-debug] POST   /api/Equipment            --> github.com/stomatolog1/praktologia/internal/handlers.(*EquipmentHandler).Create-fm (3 handlers)
+[GIN-debug] POST   /api/Executor             --> github.com/stomatolog1/praktologia/internal/handlers.(*ExecutorHandler).Create-fm (3 handlers)
+[GIN-debug] POST   /api/Project              --> github.com/stomatolog1/praktologia/internal/handlers.(*ProjectHandler).Create-fm (3 handlers)
+[GIN-debug] POST   /api/Sotrudnik            --> github.com/stomatolog1/praktologia/internal/handlers.(*SotrudnikHandler).Create-fm (3 handlers)
+[GIN-debug] POST   /api/WorkSpace            --> github.com/stomatolog1/praktologia/internal/handlers.(*WorkSpaceHandler).Create-fm (3 handlers)
+[GIN-debug] GET    /static/*filepath         --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (3 handlers)
+[GIN-debug] HEAD   /static/*filepath         --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (3 handlers)
+[GIN-debug] GET    /                         --> main.main.func1 (3 handlers)
+[GIN-debug] [WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.
+Please check https://github.com/gin-gonic/gin/blob/master/docs/doc.md#dont-trust-all-proxies for details.
+[GIN-debug] Listening and serving HTTP on :8080
+[GIN-debug] [ERROR] listen tcp :8080: bind: Only one usage of each socket address (protocol/network address/port) is normally permitted.

@@ -1,13 +1,13 @@
 package model
 
 type Project struct{
-	ID uint `json:"id" gorm:"primarykey"`
+	ID uint `json:"id" gorm:"primaryKey"`
 	Name string `json:"Name"`
 	Discription string `json:"Discription"`
 	Deadline string `json:"Deadline"` 
 	Price float64 `json:"Price"` 
-	Workers []Sotrudnik `json:"Workers" gorm:"-"`
-	Equipments []Equipment `json:"Equipments" gorm:"-"`
+	Workers []Sotrudnik `json:"Workers,omitempty" gorm:"-"`
+	Equipments []Equipment `json:"Equipments,omitempty" gorm:"-"`
 }
 
 type RequestProject struct{

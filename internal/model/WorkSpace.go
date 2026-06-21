@@ -1,14 +1,16 @@
 package model
 
 
-type WorkSpace struct{
-	ID uint `json:"id" gorm:"primarykey"`
-	Name string `json:"Name"`
-	Discription string `json:"Discription"`
-	Projects []Project
+type WorkSpace struct {
+	ID          uint      `json:"id" gorm:"primaryKey"`
+	AdminID     uint      `json:"admin_id gorm:"foreignKey:AdminID""`
+	Name        string    `json:"name"`
+	Discription string    `json:"description,omitempty"`
+	Projects    []Project `json:"projects" gorm:"foreignKey:WorkSpaceID"`
 }
 
-type RequestWorkSpace struct{
-	Name string `json:"Name"`
-	Discription string `json:"Discription"`
+type RequestWorkSpace struct {
+	AdminID     uint   `json:"admin_id"`
+	Name        string `json:"name"`
+	Discription string `json:"description,omitempty"`
 }
