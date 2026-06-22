@@ -37,6 +37,15 @@ func (s *WorkSpaceServise) GetByAdminID(adminID uint) ([]model.WorkSpace, error)
 	return s.repo.GetByAdminID(adminID)
 }
 
+func (s *WorkSpaceServise) UpdateWorkSpaceStatus(id uint, status string) (*model.WorkSpace, error) {
+    return s.repo.UpdateStatus(id, status)
+}
+
+func (s *WorkSpaceServise) DeleteWorkSpace(id uint) error {
+    // potenteally delete projects in this workspace
+    return s.repo.Delete(id)
+}
+
 func (s *WorkSpaceServise) GetAllByWorkSpace(SotrudnikID uint) ([]model.WorkSpace, error) {
 	return s.repo.GetAllByWorkSpace(SotrudnikID)
 }

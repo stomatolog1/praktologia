@@ -44,6 +44,26 @@ func (r *WorkSpaceRepository) GetByAdminID(adminID uint) ([]model.WorkSpace, err
 	return result, nil
 }
 
+func (r *WorkSpaceRepository) UpdateStatus(id uint, status string) (*model.WorkSpace, error) {
+	for _, w := range r.workspaces {
+		if w.ID == id {
+			w.Status = status
+			return w, nil
+		}
+	}
+	return nil, gorm.ErrRecordNotFound
+}
+
+func (r *WorkSpaceRepository) Delete(id uint) error {
+	for i, w := range r.workspaces {
+		if w.ID == id {
+			r.workspaces = append(r.workspaces[:i], r.workspaces[i+1:]...)
+			return nil
+		}
+	}
+	return gorm.ErrRecordNotFound
+}
+
 func (r *WorkSpaceRepository) GetAllByWorkSpace(WorkSpaceID uint) ([]model.WorkSpace, error) {
 	return []model.WorkSpace{}, nil
 }

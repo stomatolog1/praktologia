@@ -35,6 +35,10 @@ func (s *ExecutorServise) GetAll() ([]model.Executor, error) {
 	return s.repo.GetAll()
 }
 
+func (s *ExecutorServise) DeleteExecutor(id uint) error {
+	return s.repo.Delete(id)
+}
+
 func (s *ExecutorServise) GetAllByExecutor(ExecutorID uint) ([]model.Executor, error) {
 	return s.repo.GetAllByExecutor(ExecutorID)
 }

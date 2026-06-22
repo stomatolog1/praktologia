@@ -34,7 +34,10 @@ func (s *SotrudnikServise) GetAll() ([]model.Sotrudnik, error) {
 	return s.repo.GetAll()
 }
 
+func (s *SotrudnikServise) DeleteSotrudnik(id uint) error {
+	return s.repo.Delete(id)
+}
+
 func (s *SotrudnikServise) GetAllBySotrudnik(SotrudnikID uint) ([]model.Sotrudnik, error) {
 	return s.repo.GetAllBySotrudnik(SotrudnikID)
 }
-

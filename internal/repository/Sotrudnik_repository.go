@@ -34,6 +34,16 @@ func (r *SotrudnikRepository) GetAll() ([]model.Sotrudnik, error) {
 	return result, nil
 }
 
+func (r *SotrudnikRepository) Delete(id uint) error {
+	for i, s := range r.sotrudniks {
+		if s.ID == id {
+			r.sotrudniks = append(r.sotrudniks[:i], r.sotrudniks[i+1:]...)
+			return nil
+		}
+	}
+	return gorm.ErrRecordNotFound
+}
+
 func (r *SotrudnikRepository) GetAllBySotrudnik(SotrudnikID uint) ([]model.Sotrudnik, error) {
 	return []model.Sotrudnik{}, nil
 }

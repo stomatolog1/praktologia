@@ -19,6 +19,30 @@ const API = {
             throw new Error(error.error || `Ошибка запроса: ${response.status}`);
         }
         return response.json();
+    },
+
+    async put(path, body) {
+        const response = await fetch(`/api/${path}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+        if (!response.ok) {
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || `Ошибка запроса: ${response.status}`);
+        }
+        return response.json();
+    },
+
+    async delete(path) {
+        const response = await fetch(`/api/${path}`, {
+            method: 'DELETE'
+        });
+        if (!response.ok) {
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || `Ошибка запроса: ${response.status}`);
+        }
+        return response.json();
     }
 };
 

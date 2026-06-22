@@ -5,6 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Praktologia — Рабочие области</title>
     <link rel="stylesheet" href="/static/css/app.css">
+    <style>
+        .list-item-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 10px;
+        }
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: white;
+        }
+        .status-in-progress {
+            background-color: #3498db; /* Blue */
+        }
+        .status-ready {
+            background-color: #2ecc71; /* Green */
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -36,6 +55,26 @@
         document.getElementById('user-label').textContent = `Пользователь: ${user.Login}`;
         renderUserBar('user-bar');
 
+        async function updateStatus(workspaceId, newStatus) {
+            if (!confirm(`Вы уверены, что хотите изменить статус на "${newStatus}"?`)) return;
+            try {
+                await API.put(`WorkSpace/${workspaceId}/status`, { status: newStatus });
+                loadWorkspaces(); // Reload the list to show the change
+            } catch (error) {
+                alert('Ошибка обновления статуса: ' + error.message);
+            }
+        }
+
+        async function deleteWorkspace(workspaceId, workspaceName) {
+            if (!confirm(`Вы уверены, что хотите удалить рабочую область "${workspaceName}"? Все связанные с ней проекты также будут удалены.`)) return;
+            try {
+                await API.delete(`WorkSpace/${workspaceId}`);
+                loadWorkspaces(); // Reload the list
+            } catch (error) {
+                alert('Ошибка удаления: ' + error.message);
+            }
+        }
+
         async function loadWorkspaces() {
             try {
                 const workspaces = await API.get(`WorkSpace?adminId=${user.id}`);
@@ -45,15 +84,34 @@
                     return;
                 }
 
-                document.getElementById('list').innerHTML = workspaces.map(ws => `
-                    <div class="list-item">
+                const listElement = document.getElementById('list');
+                listElement.innerHTML = ''; // Clear the list before populating
+
+                for (const ws of workspaces) {
+                    const projects = await API.get(`Project?WorkSpaceID=${ws.id}`);
+                    const totalProjectsCost = projects.reduce((sum, p) => sum + (p.Price || 0), 0);
+
+                    const workspaceElement = document.createElement('div');
+                    workspaceElement.className = 'list-item';
+                    
+                    const statusClass = ws.status === 'готов' ? 'status-ready' : 'status-in-progress';
+
+                    workspaceElement.innerHTML = `
                         <a class="list-item-link" href="/static/projects.html?workspaceId=${ws.id}&workspaceName=${encodeURIComponent(ws.name)}">
                             <div class="list-item-title">${ws.name}</div>
                             <div class="list-item-meta">${ws.description || 'Без описания'}</div>
-                            <div class="list-item-meta">Сумма ресурсов: ${formatMoney(ws.totalCost || 0)}</div>
+                            <div class="list-item-meta">Общая стоимость проектов: ${formatMoney(totalProjectsCost)}</div>
                         </a>
-                    </div>
-                `).join('');
+                        <div class="list-item-actions">
+                            <span class="status-badge ${statusClass}">${ws.status}</span>
+                            <button class="btn btn-sm" onclick="updateStatus(${ws.id}, 'в работе')">В работе</button>
+                            <button class="btn btn-sm" onclick="updateStatus(${ws.id}, 'готов')">Готов</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteWorkspace(${ws.id}, '${ws.name}')">Удалить</button>
+                        </div>
+                    `;
+                    listElement.appendChild(workspaceElement);
+                }
+
             } catch (error) {
                 renderEmptyList('list', 'Ошибка загрузки: ' + error.message);
             }

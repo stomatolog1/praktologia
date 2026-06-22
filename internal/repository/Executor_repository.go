@@ -34,6 +34,16 @@ func (r *ExecutorRepository) GetAll() ([]model.Executor, error) {
 	return result, nil
 }
 
+func (r *ExecutorRepository) Delete(id uint) error {
+	for i, e := range r.executors {
+		if e.ID == id {
+			r.executors = append(r.executors[:i], r.executors[i+1:]...)
+			return nil
+		}
+	}
+	return gorm.ErrRecordNotFound
+}
+
 func (r *ExecutorRepository) GetAllByExecutor(ExecutorID uint) ([]model.Executor, error) {
 	return []model.Executor{}, nil
 }

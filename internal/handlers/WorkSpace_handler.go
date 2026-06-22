@@ -18,6 +18,8 @@ func (h *WorkSpaceHandler) RegisterRoutes(r *gin.Engine) {
 	{
 		workspace.GET("", h.GetAll)
 		workspace.POST("", h.Create)
+		workspace.PUT("/:id/status", h.UpdateStatus)
+		workspace.DELETE("/:id", h.Delete)
 	}
 }
 
@@ -63,4 +65,44 @@ func (h *WorkSpaceHandler) Create(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusCreated, workspace)
+}
+
+func (h *WorkSpaceHandler) UpdateStatus(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
+		return
+	}
+
+	var req struct {
+		Status string `json:"status"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	workspace, err := h.servise.UpdateWorkSpaceStatus(uint(id), req.Status)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, workspace)
+}
+
+func (h *WorkSpaceHandler) Delete(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
+		return
+	}
+
+	err = h.servise.DeleteWorkSpace(uint(id))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "workspace deleted"})
 }

@@ -34,6 +34,16 @@ func (r *CustomerRepository) GetAll() ([]model.Customer, error) {
 	return result, nil
 }
 
+func (r *CustomerRepository) Delete(id uint) error {
+	for i, c := range r.customers {
+		if c.ID == id {
+			r.customers = append(r.customers[:i], r.customers[i+1:]...)
+			return nil
+		}
+	}
+	return gorm.ErrRecordNotFound
+}
+
 func (r *CustomerRepository) GetAllByCustomer(CustomerID uint) ([]model.Customer, error){
 	return []model.Customer{}, nil
 }

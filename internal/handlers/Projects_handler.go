@@ -25,7 +25,7 @@ func NewProjectHandler(service *servise.ProjectServise) *ProjectHandler {
 }
 
 func (h *ProjectHandler) GetAll(c *gin.Context) {
-	workspaceIDStr := c.Query("workspaceId")
+	workspaceIDStr := c.Query("WorkSpaceID")
 	if workspaceIDStr != "" {
 		workspaceID, err := strconv.ParseUint(workspaceIDStr, 10, 32)
 		if err != nil {

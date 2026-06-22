@@ -29,6 +29,16 @@
     </div>
     <script src="/static/js/app.js"></script>
     <script>
+        async function deleteSotrudnik(id, name) {
+            if (!confirm(`Вы уверены, что хотите удалить сотрудника "${name}"?`)) return;
+            try {
+                await API.delete(`Sotrudnik/${id}`);
+                loadSotrudniki(); // Reload the list
+            } catch (error) {
+                alert('Ошибка удаления: ' + error.message);
+            }
+        }
+
         async function loadSotrudniki() {
             try {
                 const items = await API.get('Sotrudnik');
@@ -45,6 +55,9 @@
                             <div class="list-item-meta">
                                 ${s.Position} · ${formatMoney(s.PayMount)}/мес · налог ${s.Tax}%
                             </div>
+                        </div>
+                        <div class="list-item-actions">
+                            <button class="btn btn-sm btn-danger" onclick="deleteSotrudnik(${s.id}, '${formatFio(s)}')">Удалить</button>
                         </div>
                     </div>
                 `).join('');

@@ -4,6 +4,7 @@ import (
 	"github.com/stomatolog1/praktologia/internal/model"
 	"github.com/stomatolog1/praktologia/internal/servise"
 	"net/http"
+	"strconv"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,6 +17,7 @@ func (h *SotrudnikHandler) RegisterRoutes(r *gin.Engine) {
 	{
 		sotrudnik.GET("", h.GetAll)
 		sotrudnik.POST("", h.Create)
+		sotrudnik.DELETE("/:id", h.Delete)
 	}
 }
 
@@ -45,4 +47,19 @@ func (h *SotrudnikHandler) Create(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusCreated, sotrudnik)
+}
+
+func (h *SotrudnikHandler) Delete(c *gin.Context) {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		return
+	}
+
+	if err := h.servise.DeleteSotrudnik(uint(id)); err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Sotrudnik not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Sotrudnik deleted"})
 }

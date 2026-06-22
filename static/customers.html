@@ -29,6 +29,16 @@
     </div>
     <script src="/static/js/app.js"></script>
     <script>
+        async function deleteCustomer(id, name) {
+            if (!confirm(`Вы уверены, что хотите удалить заказчика "${name}"?`)) return;
+            try {
+                await API.delete(`Customer/${id}`);
+                loadCustomers(); // Reload the list
+            } catch (error) {
+                alert('Ошибка удаления: ' + error.message);
+            }
+        }
+
         async function loadCustomers() {
             try {
                 const customers = await API.get('Customer');
@@ -48,6 +58,9 @@
                             <div class="list-item-meta">
                                 ${formatFio(c)} · ${c.Email} · ${c.Phone}
                             </div>
+                        </div>
+                        <div class="list-item-actions">
+                            <button class="btn btn-sm btn-danger" onclick="deleteCustomer(${c.id}, '${c.Firm || formatFio(c)}')">Удалить</button>
                         </div>
                     </div>
                 `).join('');

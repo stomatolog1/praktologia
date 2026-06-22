@@ -29,6 +29,16 @@
     </div>
     <script src="/static/js/app.js"></script>
     <script>
+        async function deleteExecutor(id, name) {
+            if (!confirm(`Вы уверены, что хотите удалить исполнителя "${name}"?`)) return;
+            try {
+                await API.delete(`Executor/${id}`);
+                loadExecutors(); // Reload the list
+            } catch (error) {
+                alert('Ошибка удаления: ' + error.message);
+            }
+        }
+
         async function loadExecutors() {
             try {
                 const executors = await API.get('Executor');
@@ -45,6 +55,9 @@
                             <div class="list-item-meta">
                                 ${e.TypeDesign} · ${e.payTime} · ${e.Cost} ₽ · налог ${e.Tax}%
                             </div>
+                        </div>
+                         <div class="list-item-actions">
+                            <button class="btn btn-sm btn-danger" onclick="deleteExecutor(${e.id}, '${formatFio(e)}')">Удалить</button>
                         </div>
                     </div>
                 `).join('');

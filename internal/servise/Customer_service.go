@@ -36,6 +36,10 @@ func (s *CustomerServise) GetAll() ([]model.Customer, error) {
 	return s.repo.GetAll()
 }
 
+func (s *CustomerServise) DeleteCustomer(id uint) error {
+	return s.repo.Delete(id)
+}
+
 func (s *CustomerServise) GetAllByCustomer(customerID uint) ([]model.Customer, error) {
 	return s.repo.GetAllByCustomer(customerID)
 }
