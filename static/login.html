@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Praktologia — Вход</title>
+    <link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Вход</h1>
+            <p>Только авторизованные пользователи могут создавать рабочие области</p>
+        </header>
+        <div class="page-body">
+            <div class="nav-bar">
+                <a href="/" class="nav-link nav-link-back">← Главная</a>
+            </div>
+
+            <div class="card auth-card">
+                <div id="alert" class="alert"></div>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label>Логин</label>
+                        <input type="text" id="login" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Пароль</label>
+                        <input type="password" id="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-block">Войти</button>
+                </form>
+                <div class="auth-links">
+                    <a href="/static/user-create.html">Создать пользователя</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/static/js/app.js"></script>
+    <script>
+        if (Auth.getUser()) {
+            window.location.href = '/static/workspace.html';
+        }
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                const user = await API.post('Admin/login', {
+                    Login: document.getElementById('login').value,
+                    HashPass: document.getElementById('password').value
+                });
+                Auth.setUser(user);
+                window.location.href = '/static/workspace.html';
+            } catch (error) {
+                showAlert('alert', error.message, 'error');
+            }
+        });
+    </script>
+</body>
+</html>

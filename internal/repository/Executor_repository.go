@@ -26,6 +26,14 @@ func (r *ExecutorRepository) Create(executor *model.Executor) error {
 	return nil
 }
 
+func (r *ExecutorRepository) GetAll() ([]model.Executor, error) {
+	result := make([]model.Executor, len(r.executors))
+	for i, e := range r.executors {
+		result[i] = *e
+	}
+	return result, nil
+}
+
 func (r *ExecutorRepository) GetAllByExecutor(ExecutorID uint) ([]model.Executor, error) {
 	return []model.Executor{}, nil
 }

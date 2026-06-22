@@ -30,6 +30,10 @@ func (s *SotrudnikServise) CreateSotrudnik(req model.RequestSotrudnik) (*model.S
 	return sotrudnik, nil
 }
 
+func (s *SotrudnikServise) GetAll() ([]model.Sotrudnik, error) {
+	return s.repo.GetAll()
+}
+
 func (s *SotrudnikServise) GetAllBySotrudnik(SotrudnikID uint) ([]model.Sotrudnik, error) {
 	return s.repo.GetAllBySotrudnik(SotrudnikID)
 }

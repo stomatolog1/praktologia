@@ -19,9 +19,18 @@ func NewAdminAkkRepository(db *gorm.DB) *AdminAkkRepository{
 	}
 }
 
-func (r *AdminAkkRepository) Create(admin *model.AdminAkk) error{
+func (r *AdminAkkRepository) Create(admin *model.AdminAkk) error {
 	r.counter++
 	admin.ID = r.counter
 	r.admins = append(r.admins, admin)
 	return nil
+}
+
+func (r *AdminAkkRepository) FindByLogin(login string) (*model.AdminAkk, error) {
+	for _, admin := range r.admins {
+		if admin.Login == login {
+			return admin, nil
+		}
+	}
+	return nil, nil
 }

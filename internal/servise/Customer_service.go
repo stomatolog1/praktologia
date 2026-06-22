@@ -32,6 +32,10 @@ func (s *CustomerServise) CreateCustomer(req model.RequestCustomer) (*model.Cust
 	return customer, nil
 }
 
+func (s *CustomerServise) GetAll() ([]model.Customer, error) {
+	return s.repo.GetAll()
+}
+
 func (s *CustomerServise) GetAllByCustomer(customerID uint) ([]model.Customer, error) {
 	return s.repo.GetAllByCustomer(customerID)
 }

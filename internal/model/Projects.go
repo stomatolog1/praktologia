@@ -2,6 +2,7 @@ package model
 
 type Project struct{
 	ID uint `json:"id" gorm:"primaryKey"`
+	WorkSpaceID uint `json:"WorkSpaceID"`
 	Name string `json:"Name"`
 	Discription string `json:"Discription"`
 	Deadline string `json:"Deadline"` 
@@ -11,6 +12,7 @@ type Project struct{
 }
 
 type RequestProject struct{
+	WorkSpaceID uint `json:"WorkSpaceID"`
 	Name string `json:"Name"`
 	Discription string `json:"Discription"`
 	Deadline string `json:"Deadline"` 

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Praktologia — Проекты</title>
+    <link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 id="page-title">Проекты</h1>
+            <p id="page-subtitle">Список проектов рабочей области</p>
+        </header>
+        <div class="page-body">
+            <div class="nav-bar">
+                <a href="/static/workspace.html" class="nav-link nav-link-back">← Рабочие области</a>
+                <a href="/" class="nav-link nav-link-back">← Главная</a>
+            </div>
+
+            <div class="section-header">
+                <h2>Проекты</h2>
+                <a id="create-link" href="#" class="btn">+ Создать проект</a>
+            </div>
+
+            <div id="list" class="list">
+                <div class="empty-state"><p>Загрузка...</p></div>
+            </div>
+        </div>
+    </div>
+    <script src="/static/js/app.js"></script>
+    <script>
+        const user = Auth.requireAuth();
+        if (!user) throw new Error('auth required');
+
+        const workspaceId = getQueryParam('workspaceId');
+        const workspaceName = getQueryParam('workspaceName');
+
+        if (!workspaceId) {
+            window.location.href = '/static/workspace.html';
+        }
+
+        document.getElementById('page-title').textContent = workspaceName
+            ? `Проекты: ${decodeURIComponent(workspaceName)}`
+            : 'Проекты';
+        document.getElementById('create-link').href =
+            `/static/project-create.html?workspaceId=${workspaceId}&workspaceName=${encodeURIComponent(workspaceName || '')}`;
+
+        async function verifyWorkspaceAccess() {
+            const workspaces = await API.get(`WorkSpace?adminId=${user.id}`);
+            const allowed = workspaces.some(w => w.id === parseInt(workspaceId, 10));
+            if (!allowed) {
+                window.location.href = '/static/workspace.html';
+                return false;
+            }
+            return true;
+        }
+
+        async function loadProjects() {
+            try {
+                if (!(await verifyWorkspaceAccess())) return;
+
+                const projects = await API.get(`Project?workspaceId=${workspaceId}`);
+
+                if (!projects.length) {
+                    renderEmptyList('list', 'Проекты ещё не созданы. Нажмите «Создать проект».');
+                    return;
+                }
+
+                document.getElementById('list').innerHTML = projects.map(p => `
+                    <div class="list-item">
+                        <div class="list-item-link">
+                            <div class="list-item-title">${p.Name}</div>
+                            <div class="list-item-meta">
+                                Срок: ${p.Deadline || '—'} · Стоимость: ${formatMoney(p.Price || 0)}
+                            </div>
+                            <div class="list-item-meta">${p.Discription || ''}</div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                renderEmptyList('list', 'Ошибка загрузки: ' + error.message);
+            }
+        }
+
+        loadProjects();
+    </script>
+</body>
+</html>

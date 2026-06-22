@@ -30,6 +30,10 @@ func (s *EquipmentServise) CreateEquipment(req model.RequsetEquipment) (*model.E
 	return equipment, nil
 }
 
+func (s *EquipmentServise) GetAll() ([]model.Equipment, error) {
+	return s.repo.GetAll()
+}
+
 func (s *EquipmentServise) GetAllByEquipment(equipmentID uint) ([]model.Equipment, error) {
 	return s.repo.GetAllByEquipment(equipmentID)
 }

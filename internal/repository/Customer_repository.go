@@ -26,6 +26,14 @@ func (r *CustomerRepository) Create(customer *model.Customer) error{
 	return nil
 }
 
+func (r *CustomerRepository) GetAll() ([]model.Customer, error) {
+	result := make([]model.Customer, len(r.customers))
+	for i, c := range r.customers {
+		result[i] = *c
+	}
+	return result, nil
+}
+
 func (r *CustomerRepository) GetAllByCustomer(CustomerID uint) ([]model.Customer, error){
 	return []model.Customer{}, nil
 }

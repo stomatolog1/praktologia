@@ -31,6 +31,10 @@ func (s *ExecutorServise) CreateExecutor(req model.RequsetExecutor) (*model.Exec
 	return executor, nil
 }
 
+func (s *ExecutorServise) GetAll() ([]model.Executor, error) {
+	return s.repo.GetAll()
+}
+
 func (s *ExecutorServise) GetAllByExecutor(ExecutorID uint) ([]model.Executor, error) {
 	return s.repo.GetAllByExecutor(ExecutorID)
 }

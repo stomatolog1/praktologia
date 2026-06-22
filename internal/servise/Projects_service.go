@@ -15,6 +15,7 @@ func NewProjectService(repo *repository.ProjectRepository) *ProjectServise {
 
 func (s *ProjectServise) CreateProject(req model.RequestProject) (*model.Project, error) {
 	project := &model.Project{
+		WorkSpaceID: req.WorkSpaceID,
 		Name: req.Name,
 		Discription: req.Discription,
 		Deadline: req.Deadline,
@@ -28,6 +29,14 @@ func (s *ProjectServise) CreateProject(req model.RequestProject) (*model.Project
 	}
 
 	return project, nil
+}
+
+func (s *ProjectServise) GetAll() ([]model.Project, error) {
+	return s.repo.GetAll()
+}
+
+func (s *ProjectServise) GetByWorkSpace(workSpaceID uint) ([]model.Project, error) {
+	return s.repo.GetByWorkSpace(workSpaceID)
 }
 
 func (s *ProjectServise) GetAllByProject(ProjectID uint) ([]model.Project, error) {

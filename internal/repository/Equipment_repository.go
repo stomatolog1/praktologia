@@ -26,6 +26,14 @@ func (r *EquipmentRepository) Create(equipment *model.Equipment) error {
 	return nil
 }
 
+func (r *EquipmentRepository) GetAll() ([]model.Equipment, error) {
+	result := make([]model.Equipment, len(r.equipment))
+	for i, e := range r.equipment {
+		result[i] = *e
+	}
+	return result, nil
+}
+
 func (r *EquipmentRepository) GetAllByEquipment(equipmentID uint) ([]model.Equipment, error) {
 	return []model.Equipment{}, nil
 }

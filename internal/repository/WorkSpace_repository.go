@@ -26,6 +26,24 @@ func (r *WorkSpaceRepository) Create(WorkSpace *model.WorkSpace) error {
 	return nil
 }
 
+func (r *WorkSpaceRepository) GetAll() ([]model.WorkSpace, error) {
+	result := make([]model.WorkSpace, len(r.workspaces))
+	for i, w := range r.workspaces {
+		result[i] = *w
+	}
+	return result, nil
+}
+
+func (r *WorkSpaceRepository) GetByAdminID(adminID uint) ([]model.WorkSpace, error) {
+	result := make([]model.WorkSpace, 0)
+	for _, w := range r.workspaces {
+		if w.AdminID == adminID {
+			result = append(result, *w)
+		}
+	}
+	return result, nil
+}
+
 func (r *WorkSpaceRepository) GetAllByWorkSpace(WorkSpaceID uint) ([]model.WorkSpace, error) {
 	return []model.WorkSpace{}, nil
 }

@@ -1,10 +1,12 @@
 package handlers
 
 import (
+	"net/http"
+	"strconv"
+
+	"github.com/gin-gonic/gin"
 	"github.com/stomatolog1/praktologia/internal/model"
 	"github.com/stomatolog1/praktologia/internal/servise"
-	"net/http"
-	"github.com/gin-gonic/gin"
 )
 
 type WorkSpaceHandler struct {
@@ -14,12 +16,38 @@ type WorkSpaceHandler struct {
 func (h *WorkSpaceHandler) RegisterRoutes(r *gin.Engine) {
 	workspace := r.Group("api/WorkSpace")
 	{
+		workspace.GET("", h.GetAll)
 		workspace.POST("", h.Create)
 	}
 }
 
 func NewWorkSpaceHandler(service *servise.WorkSpaceServise) *WorkSpaceHandler {
 	return &WorkSpaceHandler{servise: service}
+}
+
+func (h *WorkSpaceHandler) GetAll(c *gin.Context) {
+	adminIDStr := c.Query("adminId")
+	if adminIDStr != "" {
+		adminID, err := strconv.ParseUint(adminIDStr, 10, 32)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid adminId"})
+			return
+		}
+		workspaces, err := h.servise.GetByAdminID(uint(adminID))
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, workspaces)
+		return
+	}
+
+	workspaces, err := h.servise.GetAll()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, workspaces)
 }
 
 func (h *WorkSpaceHandler) Create(c *gin.Context) {

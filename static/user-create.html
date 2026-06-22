@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Praktologia — Создание пользователя</title>
+    <link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Создание пользователя</h1>
+            <p>Новый пользователь сможет создавать свои рабочие области</p>
+        </header>
+        <div class="page-body">
+            <div class="nav-bar">
+                <a href="/" class="nav-link nav-link-back">← Главная</a>
+                <a href="/static/login.html" class="nav-link">Войти</a>
+            </div>
+
+            <div class="card auth-card">
+                <div id="alert" class="alert"></div>
+                <form id="create-form">
+                    <div class="form-group">
+                        <label>Логин</label>
+                        <input type="text" id="login" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Пароль</label>
+                        <input type="password" id="password" required minlength="4">
+                    </div>
+                    <div class="form-group">
+                        <label>Повторите пароль</label>
+                        <input type="password" id="password2" required minlength="4">
+                    </div>
+                    <button type="submit" class="btn btn-block">Создать пользователя</button>
+                </form>
+                <div class="auth-links">
+                    <a href="/static/login.html">Уже есть аккаунт? Войти</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/static/js/app.js"></script>
+    <script>
+        document.getElementById('create-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const password = document.getElementById('password').value;
+            const password2 = document.getElementById('password2').value;
+            if (password !== password2) {
+                showAlert('alert', 'Пароли не совпадают', 'error');
+                return;
+            }
+
+            try {
+                const user = await API.post('Admin', {
+                    Login: document.getElementById('login').value,
+                    HashPass: password
+                });
+                Auth.setUser(user);
+                showAlert('alert', 'Пользователь создан. Переход к рабочим областям...', 'success');
+                setTimeout(() => {
+                    window.location.href = '/static/workspace.html';
+                }, 800);
+            } catch (error) {
+                showAlert('alert', error.message, 'error');
+            }
+        });
+    </script>
+</body>
+</html>

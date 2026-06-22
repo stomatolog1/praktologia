@@ -14,12 +14,22 @@ type EquipmentHandler struct {
 func (h *EquipmentHandler) RegisterRoutes(r *gin.Engine) {
 	equipment := r.Group("api/Equipment")
 	{
+		equipment.GET("", h.GetAll)
 		equipment.POST("", h.Create)
 	}
 }
 
 func NewEquipmentHandler(service *servise.EquipmentServise) *EquipmentHandler {
 	return &EquipmentHandler{servise: service}
+}
+
+func (h *EquipmentHandler) GetAll(c *gin.Context) {
+	items, err := h.servise.GetAll()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, items)
 }
 
 func (h *EquipmentHandler) Create(c *gin.Context) {

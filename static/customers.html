@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Praktologia — Реестр заказчиков</title>
+    <link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Реестр заказчиков</h1>
+            <p>Список всех заказчиков</p>
+        </header>
+        <div class="page-body">
+            <div class="nav-bar">
+                <a href="/" class="nav-link nav-link-back">← Главная</a>
+            </div>
+
+            <div class="section-header">
+                <h2>Заказчики</h2>
+                <a href="/static/customer-create.html" class="btn">+ Создать заказчика</a>
+            </div>
+
+            <div id="list" class="list">
+                <div class="empty-state"><p>Загрузка...</p></div>
+            </div>
+        </div>
+    </div>
+    <script src="/static/js/app.js"></script>
+    <script>
+        async function loadCustomers() {
+            try {
+                const customers = await API.get('Customer');
+
+                if (!customers.length) {
+                    renderEmptyList('list', 'Заказчики ещё не добавлены. Нажмите «Создать заказчика».');
+                    return;
+                }
+
+                document.getElementById('list').innerHTML = customers.map(c => `
+                    <div class="list-item">
+                        <div class="list-item-link">
+                            <div class="list-item-title">${c.Firm || formatFio(c)}</div>
+                            <div class="list-item-meta">
+                                ${c.TypeCustomer} · ИНН: ${c.InnCustomer}
+                            </div>
+                            <div class="list-item-meta">
+                                ${formatFio(c)} · ${c.Email} · ${c.Phone}
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                renderEmptyList('list', 'Ошибка загрузки: ' + error.message);
+            }
+        }
+
+        loadCustomers();
+    </script>
+</body>
+</html>

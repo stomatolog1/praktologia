@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Praktologia — Создание исполнителя</title>
+    <link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Создание исполнителя</h1>
+            <p>Добавление исполнителя в реестр</p>
+        </header>
+        <div class="page-body">
+            <div class="nav-bar">
+                <a href="/static/executors.html" class="nav-link nav-link-back">← К реестру исполнителей</a>
+            </div>
+
+            <div class="card">
+                <div id="alert" class="alert"></div>
+                <form id="create-form">
+                    <div class="form-group">
+                        <label>Имя</label>
+                        <input type="text" id="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Отчество</label>
+                        <input type="text" id="secondName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Фамилия</label>
+                        <input type="text" id="surname">
+                    </div>
+                    <div class="form-group">
+                        <label>Тип оформления</label>
+                        <select id="typeDesign" required>
+                            <option value="ГПХ">ГПХ</option>
+                            <option value="НПД">НПД</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Налог (%)</label>
+                        <input type="number" id="tax" step="0.01" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Единица измерения</label>
+                        <select id="payTime" required>
+                            <option value="часы">часы</option>
+                            <option value="дни">дни</option>
+                            <option value="полная стоимость">полная стоимость</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Стоимость за единицу (₽)</label>
+                        <input type="number" id="cost" step="0.01" required>
+                    </div>
+                    <button type="submit" class="btn">Создать исполнителя</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="/static/js/app.js"></script>
+    <script>
+        document.getElementById('create-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                await API.post('Executor', {
+                    Name: document.getElementById('name').value,
+                    SecondName: document.getElementById('secondName').value,
+                    Surname: document.getElementById('surname').value,
+                    TypeDesign: document.getElementById('typeDesign').value,
+                    Tax: parseFloat(document.getElementById('tax').value) || 0,
+                    payTime: document.getElementById('payTime').value,
+                    Cost: parseFloat(document.getElementById('cost').value)
+                });
+                showAlert('alert', 'Исполнитель успешно создан', 'success');
+                setTimeout(() => {
+                    window.location.href = '/static/executors.html';
+                }, 800);
+            } catch (error) {
+                showAlert('alert', error.message, 'error');
+            }
+        });
+    </script>
+</body>
+</html>

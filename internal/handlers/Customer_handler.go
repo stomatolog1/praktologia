@@ -14,12 +14,22 @@ type CustomerHandler struct {
 func (h *CustomerHandler) RegisterRoutes(r *gin.Engine) {
 	customer := r.Group("api/Customer")
 	{
+		customer.GET("", h.GetAll)
 		customer.POST("", h.Create)
 	}
 }
 
 func NewCustomerHandler(service *servise.CustomerServise) *CustomerHandler {
 	return &CustomerHandler{servise: service}
+}
+
+func (h *CustomerHandler) GetAll(c *gin.Context) {
+	customers, err := h.servise.GetAll()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, customers)
 }
 
 func (h *CustomerHandler) Create(c *gin.Context) {

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Praktologia — Реестр исполнителей</title>
+    <link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Реестр исполнителей</h1>
+            <p>Физические лица — исполнители</p>
+        </header>
+        <div class="page-body">
+            <div class="nav-bar">
+                <a href="/" class="nav-link nav-link-back">← Главная</a>
+            </div>
+
+            <div class="section-header">
+                <h2>Исполнители</h2>
+                <a href="/static/executor-create.html" class="btn">+ Создать исполнителя</a>
+            </div>
+
+            <div id="list" class="list">
+                <div class="empty-state"><p>Загрузка...</p></div>
+            </div>
+        </div>
+    </div>
+    <script src="/static/js/app.js"></script>
+    <script>
+        async function loadExecutors() {
+            try {
+                const executors = await API.get('Executor');
+
+                if (!executors.length) {
+                    renderEmptyList('list', 'Исполнители ещё не добавлены. Нажмите «Создать исполнителя».');
+                    return;
+                }
+
+                document.getElementById('list').innerHTML = executors.map(e => `
+                    <div class="list-item">
+                        <div class="list-item-link">
+                            <div class="list-item-title">${formatFio(e)}</div>
+                            <div class="list-item-meta">
+                                ${e.TypeDesign} · ${e.payTime} · ${e.Cost} ₽ · налог ${e.Tax}%
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                renderEmptyList('list', 'Ошибка загрузки: ' + error.message);
+            }
+        }
+
+        loadExecutors();
+    </script>
+</body>
+</html>

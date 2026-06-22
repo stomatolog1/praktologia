@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Praktologia — Создание рабочей области</title>
+    <link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Создание рабочей области</h1>
+            <p>Добавьте ресурсы и рассчитайте сумму затрат</p>
+        </header>
+        <div class="page-body">
+            <div class="nav-bar">
+                <a href="/static/workspace.html" class="nav-link nav-link-back">← К списку областей</a>
+            </div>
+
+            <div class="card">
+                <div id="alert" class="alert"></div>
+                <form id="create-form">
+                    <div class="form-group">
+                        <label>Название рабочей области</label>
+                        <input type="text" id="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Описание</label>
+                        <textarea id="description"></textarea>
+                    </div>
+
+                    <h2 style="margin: 24px 0 16px; color:#667eea;">Ресурсы рабочей области</h2>
+
+                    <div class="resource-block">
+                        <h3>Сотрудники</h3>
+                        <div class="resource-row">
+                            <div class="form-group" style="margin:0">
+                                <label>Сотрудник из реестра</label>
+                                <select id="sotrudnik-select"><option value="">Загрузка...</option></select>
+                            </div>
+                            <div class="form-group" style="margin:0">
+                                <label>Кол-во дней</label>
+                                <input type="number" id="sotrudnik-days" min="1" step="1" value="1">
+                            </div>
+                            <button type="button" class="btn" id="add-sotrudnik">Добавить</button>
+                        </div>
+                        <div id="sotrudnik-items" class="resource-items"></div>
+                    </div>
+
+                    <div class="resource-block">
+                        <h3>Исполнители</h3>
+                        <div class="resource-row">
+                            <div class="form-group" style="margin:0">
+                                <label>Исполнитель из реестра</label>
+                                <select id="executor-select"><option value="">Загрузка...</option></select>
+                            </div>
+                            <div class="form-group" style="margin:0">
+                                <label>Кол-во единиц</label>
+                                <input type="number" id="executor-qty" min="1" step="0.5" value="1">
+                            </div>
+                            <button type="button" class="btn" id="add-executor">Добавить</button>
+                        </div>
+                        <div id="executor-items" class="resource-items"></div>
+                    </div>
+
+                    <div class="resource-block">
+                        <h3>Оборудование</h3>
+                        <div class="resource-row">
+                            <div class="form-group" style="margin:0">
+                                <label>Оборудование из реестра</label>
+                                <select id="equipment-select"><option value="">Загрузка...</option></select>
+                            </div>
+                            <div class="form-group" style="margin:0">
+                                <label>Кол-во единиц</label>
+                                <input type="number" id="equipment-qty" min="1" step="0.5" value="1">
+                            </div>
+                            <button type="button" class="btn" id="add-equipment">Добавить</button>
+                        </div>
+                        <div id="equipment-items" class="resource-items"></div>
+                    </div>
+
+                    <div class="total-box" style="margin: 20px 0;">
+                        <span>Итоговая сумма ресурсов:</span>
+                        <span id="total-cost">0 ₽</span>
+                    </div>
+
+                    <button type="submit" class="btn btn-block">Создать рабочую область</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="/static/js/app.js"></script>
+    <script>
+        const user = Auth.requireAuth();
+        if (!user) throw new Error('auth required');
+
+        let sotrudniki = [];
+        let executors = [];
+        let equipment = [];
+        const selectedResources = [];
+
+        function fillSelect(selectId, items, labelFn, emptyText) {
+            const select = document.getElementById(selectId);
+            if (!items.length) {
+                select.innerHTML = `<option value="">${emptyText}</option>`;
+                return;
+            }
+            select.innerHTML = '<option value="">— выберите —</option>' +
+                items.map(item => `<option value="${item.id}">${labelFn(item)}</option>`).join('');
+        }
+
+        async function loadRegistries() {
+            [sotrudniki, executors, equipment] = await Promise.all([
+                API.get('Sotrudnik'),
+                API.get('Executor'),
+                API.get('Equipment')
+            ]);
+
+            fillSelect('sotrudnik-select', sotrudniki, s => `${formatFio(s)} (${s.Position})`, 'Нет сотрудников в реестре');
+            fillSelect('executor-select', executors, e => `${formatFio(e)} (${e.TypeDesign}, ${e.payTime})`, 'Нет исполнителей в реестре');
+            fillSelect('equipment-select', equipment, e => `${e.Name} (${e.PayTime})`, 'Нет оборудования в реестре');
+        }
+
+        function renderResources() {
+            const groups = {
+                sotrudnik: document.getElementById('sotrudnik-items'),
+                executor: document.getElementById('executor-items'),
+                equipment: document.getElementById('equipment-items')
+            };
+
+            Object.values(groups).forEach(el => el.innerHTML = '');
+
+            selectedResources.forEach((item, index) => {
+                const group = groups[item.type];
+                if (!group) return;
+                group.innerHTML += `
+                    <div class="resource-item">
+                        <div class="resource-item-info">
+                            <strong>${item.name}</strong>
+                            <div class="list-item-meta">${item.details}</div>
+                        </div>
+                        <div class="resource-item-cost">${formatMoney(item.lineCost)}</div>
+                        <button type="button" class="btn btn-secondary btn-sm" data-index="${index}">×</button>
+                    </div>
+                `;
+            });
+
+            document.querySelectorAll('.resource-items button[data-index]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    selectedResources.splice(parseInt(btn.dataset.index, 10), 1);
+                    renderResources();
+                });
+            });
+
+            const total = selectedResources.reduce((sum, r) => sum + r.lineCost, 0);
+            document.getElementById('total-cost').textContent = formatMoney(total);
+        }
+
+        function addResource(type, entity, quantity, details, lineCost) {
+            selectedResources.push({
+                type,
+                resourceId: entity.id,
+                name: type === 'equipment' ? entity.Name : formatFio(entity),
+                quantity,
+                unitCost: lineCost / quantity,
+                lineCost,
+                details
+            });
+            renderResources();
+        }
+
+        document.getElementById('add-sotrudnik').addEventListener('click', () => {
+            const id = parseInt(document.getElementById('sotrudnik-select').value, 10);
+            const days = parseFloat(document.getElementById('sotrudnik-days').value);
+            if (!id || !days) return showAlert('alert', 'Выберите сотрудника и укажите кол-во дней', 'error');
+            const s = sotrudniki.find(x => x.id === id);
+            const cost = calcSotrudnikCost(s, days);
+            addResource('sotrudnik', s, days, `${s.Position}, ${days} дн.`, cost);
+        });
+
+        document.getElementById('add-executor').addEventListener('click', () => {
+            const id = parseInt(document.getElementById('executor-select').value, 10);
+            const qty = parseFloat(document.getElementById('executor-qty').value);
+            if (!id || !qty) return showAlert('alert', 'Выберите исполнителя и кол-во единиц', 'error');
+            const e = executors.find(x => x.id === id);
+            const cost = calcExecutorCost(e, qty);
+            addResource('executor', e, qty, `${e.TypeDesign}, ${qty} ${e.payTime}`, cost);
+        });
+
+        document.getElementById('add-equipment').addEventListener('click', () => {
+            const id = parseInt(document.getElementById('equipment-select').value, 10);
+            const qty = parseFloat(document.getElementById('equipment-qty').value);
+            if (!id || !qty) return showAlert('alert', 'Выберите оборудование и кол-во единиц', 'error');
+            const e = equipment.find(x => x.id === id);
+            const cost = calcEquipmentCost(e, qty);
+            addResource('equipment', e, qty, `${e.PayTime}, ${qty} ед.`, cost);
+        });
+
+        document.getElementById('create-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const totalCost = selectedResources.reduce((sum, r) => sum + r.lineCost, 0);
+
+            try {
+                await API.post('WorkSpace', {
+                    admin_id: user.id,
+                    name: document.getElementById('name').value,
+                    description: document.getElementById('description').value,
+                    totalCost,
+                    resources: selectedResources.map(r => ({
+                        type: r.type,
+                        resourceId: r.resourceId,
+                        name: r.name,
+                        quantity: r.quantity,
+                        unitCost: r.unitCost,
+                        lineCost: r.lineCost
+                    }))
+                });
+                showAlert('alert', 'Рабочая область создана', 'success');
+                setTimeout(() => {
+                    window.location.href = '/static/workspace.html';
+                }, 800);
+            } catch (error) {
+                showAlert('alert', error.message, 'error');
+            }
+        });
+
+        loadRegistries().catch(err => showAlert('alert', err.message, 'error'));
+        renderResources();
+    </script>
+</body>
+</html>

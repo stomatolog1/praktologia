@@ -26,6 +26,14 @@ func (r *SotrudnikRepository) Create(sotrudnik *model.Sotrudnik) error {
 	return nil
 }
 
+func (r *SotrudnikRepository) GetAll() ([]model.Sotrudnik, error) {
+	result := make([]model.Sotrudnik, len(r.sotrudniks))
+	for i, s := range r.sotrudniks {
+		result[i] = *s
+	}
+	return result, nil
+}
+
 func (r *SotrudnikRepository) GetAllBySotrudnik(SotrudnikID uint) ([]model.Sotrudnik, error) {
 	return []model.Sotrudnik{}, nil
 }

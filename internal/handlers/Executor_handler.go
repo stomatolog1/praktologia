@@ -14,12 +14,22 @@ type ExecutorHandler struct {
 func (h *ExecutorHandler) RegisterRoutes(r *gin.Engine) {
 	executor := r.Group("api/Executor")
 	{
+		executor.GET("", h.GetAll)
 		executor.POST("", h.Create)
 	}
 }
 
 func NewExecutorHandler(service *servise.ExecutorServise) *ExecutorHandler {
 	return &ExecutorHandler{servise: service}
+}
+
+func (h *ExecutorHandler) GetAll(c *gin.Context) {
+	executors, err := h.servise.GetAll()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, executors)
 }
 
 func (h *ExecutorHandler) Create(c *gin.Context) {

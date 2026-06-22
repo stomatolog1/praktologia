@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Praktologia — Создание сотрудника</title>
+    <link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Создание сотрудника</h1>
+            <p>Добавление сотрудника в общий реестр</p>
+        </header>
+        <div class="page-body">
+            <div class="nav-bar">
+                <a href="/static/sotrudniki.html" class="nav-link nav-link-back">← К реестру сотрудников</a>
+            </div>
+
+            <div class="card">
+                <div id="alert" class="alert"></div>
+                <form id="create-form">
+                    <div class="form-group">
+                        <label>Имя</label>
+                        <input type="text" id="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Отчество</label>
+                        <input type="text" id="secondName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Фамилия</label>
+                        <input type="text" id="surname">
+                    </div>
+                    <div class="form-group">
+                        <label>Должность</label>
+                        <input type="text" id="position" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Зарплата в месяц (₽)</label>
+                        <input type="number" id="salary" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Налоговая ставка (%)</label>
+                        <input type="number" id="tax" step="0.01" value="30.2">
+                    </div>
+                    <button type="submit" class="btn">Создать сотрудника</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="/static/js/app.js"></script>
+    <script>
+        document.getElementById('create-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                await API.post('Sotrudnik', {
+                    Name: document.getElementById('name').value,
+                    SecondName: document.getElementById('secondName').value,
+                    Surname: document.getElementById('surname').value,
+                    Position: document.getElementById('position').value,
+                    PayMount: parseFloat(document.getElementById('salary').value),
+                    Tax: parseFloat(document.getElementById('tax').value)
+                });
+                showAlert('alert', 'Сотрудник успешно создан', 'success');
+                setTimeout(() => {
+                    window.location.href = '/static/sotrudniki.html';
+                }, 800);
+            } catch (error) {
+                showAlert('alert', error.message, 'error');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Praktologia — Создание заказчика</title>
+    <link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Создание заказчика</h1>
+            <p>Добавление нового заказчика в реестр</p>
+        </header>
+        <div class="page-body">
+            <div class="nav-bar">
+                <a href="/static/customers.html" class="nav-link nav-link-back">← К реестру заказчиков</a>
+            </div>
+
+            <div class="card">
+                <div id="alert" class="alert"></div>
+                <form id="create-form">
+                    <div class="form-group">
+                        <label>ИНН</label>
+                        <input type="number" id="inn" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Тип заказчика</label>
+                        <select id="type" required>
+                            <option value="Физическое лицо">Физическое лицо</option>
+                            <option value="Индивидуальный предприниматель">Индивидуальный предприниматель</option>
+                            <option value="Юридическое лицо">Юридическое лицо</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Название организации</label>
+                        <input type="text" id="firm" placeholder="Для ЮЛ и ИП">
+                    </div>
+                    <div class="form-group">
+                        <label>Имя</label>
+                        <input type="text" id="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Отчество</label>
+                        <input type="text" id="secondName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Фамилия</label>
+                        <input type="text" id="surname">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Телефон</label>
+                        <input type="tel" id="phone" required>
+                    </div>
+                    <button type="submit" class="btn">Создать заказчика</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="/static/js/app.js"></script>
+    <script>
+        document.getElementById('create-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                await API.post('Customer', {
+                    InnCustomer: parseInt(document.getElementById('inn').value, 10),
+                    TypeCustomer: document.getElementById('type').value,
+                    Firm: document.getElementById('firm').value,
+                    Name: document.getElementById('name').value,
+                    SecondName: document.getElementById('secondName').value,
+                    Surname: document.getElementById('surname').value,
+                    Email: document.getElementById('email').value,
+                    Phone: parseInt(document.getElementById('phone').value, 10)
+                });
+                showAlert('alert', 'Заказчик успешно создан', 'success');
+                setTimeout(() => {
+                    window.location.href = '/static/customers.html';
+                }, 800);
+            } catch (error) {
+                showAlert('alert', error.message, 'error');
+            }
+        });
+    </script>
+</body>
+</html>

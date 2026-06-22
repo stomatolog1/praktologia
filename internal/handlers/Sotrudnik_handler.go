@@ -14,12 +14,22 @@ type SotrudnikHandler struct {
 func (h *SotrudnikHandler) RegisterRoutes(r *gin.Engine) {
 	sotrudnik := r.Group("api/Sotrudnik")
 	{
+		sotrudnik.GET("", h.GetAll)
 		sotrudnik.POST("", h.Create)
 	}
 }
 
 func NewSotrudnikHandler(service *servise.SotrudnikServise) *SotrudnikHandler {
 	return &SotrudnikHandler{servise: service}
+}
+
+func (h *SotrudnikHandler) GetAll(c *gin.Context) {
+	items, err := h.servise.GetAll()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, items)
 }
 
 func (h *SotrudnikHandler) Create(c *gin.Context) {

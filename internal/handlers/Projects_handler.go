@@ -4,6 +4,7 @@ import (
 	"github.com/stomatolog1/praktologia/internal/model"
 	"github.com/stomatolog1/praktologia/internal/servise"
 	"net/http"
+	"strconv"
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,12 +15,38 @@ type ProjectHandler struct {
 func (h *ProjectHandler) RegisterRoutes(r *gin.Engine) {
 	project := r.Group("api/Project")
 	{
+		project.GET("", h.GetAll)
 		project.POST("", h.Create)
 	}
 }
 
 func NewProjectHandler(service *servise.ProjectServise) *ProjectHandler {
 	return &ProjectHandler{servise: service}
+}
+
+func (h *ProjectHandler) GetAll(c *gin.Context) {
+	workspaceIDStr := c.Query("workspaceId")
+	if workspaceIDStr != "" {
+		workspaceID, err := strconv.ParseUint(workspaceIDStr, 10, 32)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid workspaceId"})
+			return
+		}
+		projects, err := h.servise.GetByWorkSpace(uint(workspaceID))
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, projects)
+		return
+	}
+
+	projects, err := h.servise.GetAll()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, projects)
 }
 
 func (h *ProjectHandler) Create(c *gin.Context) {

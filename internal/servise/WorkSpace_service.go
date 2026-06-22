@@ -15,9 +15,11 @@ func NewWorkSpaceService(repo *repository.WorkSpaceRepository) *WorkSpaceServise
 
 func (s *WorkSpaceServise) CreateWorkSpace(req model.RequestWorkSpace) (*model.WorkSpace, error) {
 	WorkSpace := &model.WorkSpace{
-		AdminID: req.AdminID,
-		Name: req.Name,
+		AdminID:     req.AdminID,
+		Name:        req.Name,
 		Discription: req.Discription,
+		TotalCost:   req.TotalCost,
+		Resources:   req.Resources,
 	}
 
 	if err := s.repo.Create(WorkSpace); err != nil {
@@ -25,6 +27,14 @@ func (s *WorkSpaceServise) CreateWorkSpace(req model.RequestWorkSpace) (*model.W
 	}
 
 	return WorkSpace, nil
+}
+
+func (s *WorkSpaceServise) GetAll() ([]model.WorkSpace, error) {
+	return s.repo.GetAll()
+}
+
+func (s *WorkSpaceServise) GetByAdminID(adminID uint) ([]model.WorkSpace, error) {
+	return s.repo.GetByAdminID(adminID)
 }
 
 func (s *WorkSpaceServise) GetAllByWorkSpace(SotrudnikID uint) ([]model.WorkSpace, error) {

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Praktologia — Рабочие области</title>
+    <link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Мои рабочие области</h1>
+            <p id="user-label">Ваши рабочие области и проекты</p>
+        </header>
+        <div class="page-body">
+            <div class="nav-bar">
+                <a href="/" class="nav-link nav-link-back">← Главная</a>
+                <div id="user-bar" style="margin-left:auto;display:flex;gap:10px;align-items:center;"></div>
+            </div>
+
+            <div class="section-header">
+                <h2>Список рабочих областей</h2>
+                <a href="/static/workspace-create.html" class="btn">+ Создать рабочую область</a>
+            </div>
+
+            <div id="list" class="list">
+                <div class="empty-state"><p>Загрузка...</p></div>
+            </div>
+        </div>
+    </div>
+    <script src="/static/js/app.js"></script>
+    <script>
+        const user = Auth.requireAuth();
+        if (!user) throw new Error('auth required');
+
+        document.getElementById('user-label').textContent = `Пользователь: ${user.Login}`;
+        renderUserBar('user-bar');
+
+        async function loadWorkspaces() {
+            try {
+                const workspaces = await API.get(`WorkSpace?adminId=${user.id}`);
+
+                if (!workspaces.length) {
+                    renderEmptyList('list', 'У вас пока нет рабочих областей. Создайте первую.');
+                    return;
+                }
+
+                document.getElementById('list').innerHTML = workspaces.map(ws => `
+                    <div class="list-item">
+                        <a class="list-item-link" href="/static/projects.html?workspaceId=${ws.id}&workspaceName=${encodeURIComponent(ws.name)}">
+                            <div class="list-item-title">${ws.name}</div>
+                            <div class="list-item-meta">${ws.description || 'Без описания'}</div>
+                            <div class="list-item-meta">Сумма ресурсов: ${formatMoney(ws.totalCost || 0)}</div>
+                        </a>
+                    </div>
+                `).join('');
+            } catch (error) {
+                renderEmptyList('list', 'Ошибка загрузки: ' + error.message);
+            }
+        }
+
+        loadWorkspaces();
+    </script>
+</body>
+</html>

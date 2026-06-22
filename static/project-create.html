@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Praktologia — Создание проекта</title>
+    <link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Создание проекта</h1>
+            <p id="workspace-label">Новый проект в рабочей области</p>
+        </header>
+        <div class="page-body">
+            <div class="nav-bar">
+                <a id="back-link" href="#" class="nav-link nav-link-back">← К проектам</a>
+            </div>
+
+            <div class="card">
+                <div id="alert" class="alert"></div>
+                <form id="create-form">
+                    <div class="form-group">
+                        <label>Название проекта</label>
+                        <input type="text" id="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Описание</label>
+                        <textarea id="description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Срок выполнения</label>
+                        <input type="date" id="deadline" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Стоимость (₽)</label>
+                        <input type="number" id="price" step="0.01" min="0" value="0">
+                    </div>
+                    <button type="submit" class="btn">Создать проект</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="/static/js/app.js"></script>
+    <script>
+        const user = Auth.requireAuth();
+        if (!user) throw new Error('auth required');
+
+        const workspaceId = getQueryParam('workspaceId');
+        const workspaceName = getQueryParam('workspaceName');
+
+        if (!workspaceId) {
+            window.location.href = '/static/workspace.html';
+        }
+
+        if (workspaceName) {
+            document.getElementById('workspace-label').textContent =
+                'Рабочая область: ' + decodeURIComponent(workspaceName);
+        }
+
+        document.getElementById('back-link').href =
+            `/static/projects.html?workspaceId=${workspaceId}&workspaceName=${encodeURIComponent(workspaceName || '')}`;
+
+        async function verifyWorkspaceAccess() {
+            const workspaces = await API.get(`WorkSpace?adminId=${user.id}`);
+            const allowed = workspaces.some(w => w.id === parseInt(workspaceId, 10));
+            if (!allowed) {
+                window.location.href = '/static/workspace.html';
+            }
+        }
+
+        verifyWorkspaceAccess();
+
+        document.getElementById('create-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                await API.post('Project', {
+                    WorkSpaceID: parseInt(workspaceId, 10),
+                    Name: document.getElementById('name').value,
+                    Discription: document.getElementById('description').value,
+                    Deadline: document.getElementById('deadline').value,
+                    Price: parseFloat(document.getElementById('price').value) || 0,
+                    Workers: [],
+                    Equipments: []
+                });
+                showAlert('alert', 'Проект успешно создан', 'success');
+                setTimeout(() => {
+                    window.location.href = document.getElementById('back-link').href;
+                }, 800);
+            } catch (error) {
+                showAlert('alert', error.message, 'error');
+            }
+        });
+    </script>
+</body>
+</html>
