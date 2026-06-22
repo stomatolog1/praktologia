@@ -23,6 +23,8 @@ func main() {
 	projectRepo := repository.NewProjectRepository(nil)
 	sotrudnikRepo := repository.NewSotrudnikRepository(nil)
 	workspaceRepo := repository.NewWorkSpaceRepository(nil)
+	nmaRepo := repository.NewNMARepository(projectRepo, sotrudnikRepo, equipmentRepo)
+	commercialOfferRepo := repository.NewCommercialOfferRepository(projectRepo, customerRepo)
 
 	// Инициализация сервисов
 	adminService := servise.NewAdminAkkService(adminRepo)
@@ -32,6 +34,8 @@ func main() {
 	projectService := servise.NewProjectService(projectRepo)
 	sotrudnikService := servise.NewSotrudnikService(sotrudnikRepo)
 	workspaceService := servise.NewWorkSpaceService(workspaceRepo)
+	nmaService := servise.NewNMAService(nmaRepo)
+	commercialOfferService := servise.NewCommercialOfferService(commercialOfferRepo)
 
 	// Инициализация Gin
 	router := gin.Default()
@@ -58,6 +62,16 @@ func main() {
 	workspaceHandler := handlers.NewWorkSpaceHandler(workspaceService)
 	workspaceHandler.RegisterRoutes(router)
 
+	nmaHandler := handlers.NewNMAHandler(nmaService)
+	nmaHandler.RegisterRoutes(router)
+
+	commercialOfferHandler := handlers.NewCommercialOfferHandler(commercialOfferService)
+	commercialOfferHandler.RegisterRoutes(router)
+
+	// Добавляем маршруты для получения данных в JSON
+	router.GET("/projects", projectHandler.GetAll)
+    router.GET("/customers", customerHandler.GetAll)
+
 	// Обслуживание статических файлов в конце
 	router.Static("/static", staticDir)
 	router.GET("/", func(c *gin.Context) {
@@ -67,6 +81,3 @@ func main() {
 	// Запуск сервера
 	router.Run(":8080")
 }
-
-
-

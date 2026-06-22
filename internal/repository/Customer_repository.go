@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"github.com/stomatolog1/praktologia/internal/model"
 	"gorm.io/gorm"
 )
@@ -32,6 +33,15 @@ func (r *CustomerRepository) GetAll() ([]model.Customer, error) {
 		result[i] = *c
 	}
 	return result, nil
+}
+
+func (r *CustomerRepository) GetCustomerByID(id uint) (*model.Customer, error) {
+    for _, c := range r.customers {
+        if c.ID == id {
+            return c, nil
+        }
+    }
+    return nil, errors.New("customer not found")
 }
 
 func (r *CustomerRepository) Delete(id uint) error {

@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"github.com/stomatolog1/praktologia/internal/model"
 	"gorm.io/gorm"
 )
@@ -50,4 +51,13 @@ func (r *ProjectRepository) GetAllByProject(ProjectID uint) ([]model.Project, er
 
 func (r *ProjectRepository) GetProjectsByWorkSpace(projectID []uint) ([]model.Project, error) {
 	return []model.Project{}, nil
+}
+
+func (r *ProjectRepository) GetProjectByID(id uint) (*model.Project, error) {
+	for _, p := range r.projects {
+		if p.ID == id {
+			return p, nil
+		}
+	}
+	return nil, errors.New("project not found")
 }
